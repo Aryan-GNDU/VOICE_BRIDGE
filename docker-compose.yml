@@ -1,0 +1,10 @@
+services:
+  assistant-api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      ENVIRONMENT: local
+    restart: unless-stopped
