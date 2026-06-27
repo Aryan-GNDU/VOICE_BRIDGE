@@ -9,12 +9,22 @@ class HealthResponse(BaseModel):
     status: str
 
 
+class VocalBridgeResponse(BaseModel):
+    """Voice session details returned by VocalBridge."""
+
+    session_id: str | None = None
+    token: str | None = None
+    livekit_url: str | None = None
+    raw: dict = Field(default_factory=dict)
+
+
 class ChatResponse(BaseModel):
     """Chat response returned by the assistant."""
 
     conversation_id: str
     answer: str
     tools_available: list[str] = Field(default_factory=list)
+    voice: VocalBridgeResponse | None = None
 
 
 class ResetMemoryResponse(BaseModel):

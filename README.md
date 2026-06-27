@@ -9,6 +9,7 @@ LangChain `create_agent`, tool selection, conversational memory, and FastAPI.
 - Uses Groq as the LLM provider.
 - Routes questions to Google Search, Wikipedia, arXiv, or a combination of tools.
 - Maintains conversation memory by `conversation_id`.
+- Can create VocalBridge voice session details from `/chat` with `voice=true`.
 - Exposes `/chat`, `/reset-memory`, `/health`, `/tools`, and `/config`.
 - Keeps credentials in environment variables.
 - Includes structured logging, typed schemas, deployment files, and tests.
@@ -37,11 +38,15 @@ GROQ_API_KEY=...
 GOOGLE_API_KEY=...
 GOOGLE_CSE_ID=...
 MODEL_NAME=openai/gpt-oss-120b
+VOCAL_BRIDGE_API_KEY=...
+VOCAL_BRIDGE_AGENT_ID=...
 ```
 
 `GROQ_API_KEY` is required for `/chat`. `GOOGLE_API_KEY` and `GOOGLE_CSE_ID`
 are required only when the agent chooses Google Search. Wikipedia and arXiv do
-not require API keys.
+not require API keys. `VOCAL_BRIDGE_API_KEY` is required only when calling
+`/chat` with `voice=true`; `VOCAL_BRIDGE_AGENT_ID` is optional, but recommended
+when you want sessions tied to a specific VocalBridge agent.
 
 ## Run Locally
 
@@ -73,6 +78,12 @@ docker compose up --build
 curl -X POST http://localhost:8000/chat \
   -H "Content-Type: application/json" \
   -d '{"conversation_id":"demo","message":"What happened in AI this week?"}'
+```
+
+```bash
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo","message":"Say this back by voice.","voice":true}'
 ```
 
 ```bash

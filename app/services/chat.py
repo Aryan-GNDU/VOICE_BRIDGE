@@ -8,6 +8,7 @@ from app.agent.builder import AgentBuilder
 from app.config.logger import get_logger
 from app.schemas.request import ChatRequest
 from app.schemas.response import ChatResponse, ToolInfo
+from app.services.vocal_bridge import VocalBridgeService
 from app.tools.registry import ToolRegistry
 from app.utils.exceptions import LLMError
 
@@ -21,6 +22,7 @@ class ChatService:
         self.tool_registry = ToolRegistry()
         self.builder = AgentBuilder(tool_registry=self.tool_registry)
         self.agent = self.builder.build()
+        self.vocal_bridge = VocalBridgeService()
 
     async def chat(self, request: ChatRequest) -> ChatResponse:
         """Invoke the conversational agent for a user message."""
@@ -36,6 +38,13 @@ class ChatService:
             raise LLMError("The assistant could not complete the request.") from exc
 
         answer = self._extract_answer(result)
+        voice = None
+        if request.voice:
+            voice = await self.vocal_bridge.create_voice_response(
+                conversation_id=request.conversation_id,
+                user_message=request.message,
+                assistant_answer=answer,
+            )
         elapsed_ms = round((perf_counter() - start) * 1000, 2)
         logger.info(
             "chat.completed",
@@ -43,12 +52,14 @@ class ChatService:
                 "conversation_id": request.conversation_id,
                 "elapsed_ms": elapsed_ms,
                 "tools_available": self.tool_registry.tool_names(),
+                "voice_enabled": request.voice,
             },
         )
         return ChatResponse(
             conversation_id=request.conversation_id,
             answer=answer,
             tools_available=self.tool_registry.tool_names(),
+            voice=voice,
         )
 
     def reset_memory(self, conversation_id: str) -> None:

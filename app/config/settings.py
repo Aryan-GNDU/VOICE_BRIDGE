@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     google_cse_id: str | None = Field(default=None, alias="GOOGLE_CSE_ID")
     langchain_api_key: SecretStr | None = Field(default=None, alias="LANGCHAIN_API_KEY")
     langsmith_api_key: SecretStr | None = Field(default=None, alias="LANGSMITH_API_KEY")
+    vocal_bridge_api_key: SecretStr | None = Field(default=None, alias="VOCAL_BRIDGE_API_KEY")
+    vocal_bridge_agent_id: str | None = Field(default=None, alias="VOCAL_BRIDGE_AGENT_ID")
 
     model_name: str = Field(default="openai/gpt-oss-120b", alias="MODEL_NAME")
     temperature: float = Field(default=0.2, ge=0.0, le=2.0, alias="TEMPERATURE")
